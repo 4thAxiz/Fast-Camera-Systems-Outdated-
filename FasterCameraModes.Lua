@@ -58,8 +58,8 @@ Module.OverTheShoulder = function(_, CameraAngleX, CameraAngleY, Lerp)
 	Module.CameraAngleY = CameraAngleY or Module.CameraAngleY
 	if Camera.CameraType ~= Enum.CameraType.Scriptable then Camera.CameraType = Enum.CameraType.Scriptable end
 	
-	local Cosy, Siny = math.cos(CameraAngleX),  math.sin(CameraAngleX)
-	local Cosx, Sinx = math.cos(CameraAngleY), math.sin(CameraAngleY)
+	local Cosy, Siny = math.cos(Module.CameraAngleX),  math.sin(Module.CameraAngleX)
+	local Cosx, Sinx = math.cos(Module.CameraAngleY), math.sin(Module.CameraAngleY)
 	local Origin = CFrame.new((HumanoidRootPart.CFrame.Position)) * CFrame.new(
 		0, 0, 0, 
 		Cosy, Siny*Sinx, Siny*Cosx, 
