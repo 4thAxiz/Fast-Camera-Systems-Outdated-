@@ -10,10 +10,21 @@ Module.EnableTopDownCamera() -- Functions are pretty self-documenting
 ```
 
 # Camera Modes
+## Over The Shoulder
+
 ## Top Down Camera
 ![image](https://user-images.githubusercontent.com/73378249/175833398-4114805f-549b-462c-922a-90277a2c42b6.png)
 
-##
+## Isometric Camera
+![image](https://user-images.githubusercontent.com/73378249/175834608-4d90a4ce-fae4-4bba-a0df-e483e99d5c65.png)
+
+## Side-Scrolling Camera
+
+![image](https://user-images.githubusercontent.com/73378249/175834668-7f013fdd-ad43-406c-85fa-8853b98ccffc.png)
+
+## Follow-Mouse
+![image](https://user-images.githubusercontent.com/73378249/175834787-5ec8ec55-b6e1-47f0-b332-d0245a6944d9.png)
+
 
 # Design 
 Purely math based camera designed from scratch. Intended to be lightweight and flexible for future-proofing. All the math I wrote is carefully optimized in considering to modern architectures and in consideration to lower-end architectures like ARM. For those who crave all the slightest optimizations possible, I made a seperate CameraModes module (FastCameraModes) but I leave my cautions as readability is sacraficed considerably.
