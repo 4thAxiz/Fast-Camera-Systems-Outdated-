@@ -27,7 +27,7 @@ Module.EnableTopDownCamera() -- Functions are pretty self-documenting
 
 
 # Design 
-Purely math based camera designed from scratch. Intended to be lightweight and flexible for future-proofing. All the math I wrote is carefully optimized in considering to modern architectures and in consideration to lower-end architectures like ARM. For those who crave all the slightest optimizations possible, I made a seperate CameraModes module (FastCameraModes) but I leave my cautions as readability is sacraficed considerably.
+Purely math based camera designed from scratch. Intended to be lightweight and flexible for future-proofing. All the math I wrote is carefully optimized in consideratio to modern architectures and in consideration to lower-end architectures like ARM. For those who crave all the slightest optimizations possible, I made a seperate CameraModes module (FastCameraModes) but I leave my cautions as readability is sacraficed considerably.
 
 The challenge posed for deriving and writing a fast camera:
 - GC footprint: Luau's GC (garbage collector) is notorious when it comes to cleaning up userdata creation or even table creations that may result in GC Assist instructions which will halt Luau scripts for this extra work needing to be done by the GC.
