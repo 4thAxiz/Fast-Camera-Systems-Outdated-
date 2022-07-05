@@ -174,7 +174,8 @@ Module.TopDownCamera = function(_, FaceMouse, MouseSensitivity, Offset, Directio
 		Root.CFrame = CFrame.fromMatrix(Root.Position, -Right, Vector3.yAxis)
 	end
 	
-	local Axis = Vector3.new(-((Mouse.Y-ScreenSizeY*0.5)*PixelCoordinateRatioY),0,((Mouse.X-ScreenSizeX*0.5)*PixelCoordinateRatioX))
+	local Mx, My = UserInputService:GetMouseLocation()
+	local Axis = Vector3.new(-((My-ScreenSizeY*0.5)*PixelCoordinateRatioY),0,((Mx-ScreenSizeX*0.5)*PixelCoordinateRatioX))
 	local Eye = (Distance + (Root.Position+Offset)) + Axis * MouseSensitivity 
 	
 	local XAxis = (Eye + Direction)-Eye
