@@ -17,6 +17,7 @@ local CameraModes = require(script:WaitForChild("CameraModes"))
 
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local CAS = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 
 --------------------------------------------------------------------
@@ -30,14 +31,11 @@ local function LockCenter(Input)
 end
 
 
-
 local function MouseMovementTrack(_, Input, Object)
 	if Input == Enum.UserInputState.Change then
 		CameraModes.OverTheShoulder(nil, CameraModes.CameraAngleX-Object.Delta.X, math.clamp(CameraModes.CameraAngleY-Object.Delta.Y*0.4, -75, 75))
 	end
 end
-
-
 
 
 --------------------------------------------------------------------
@@ -50,7 +48,8 @@ end
 
 function Module.EnableShiftLockCamera()
 	Module.Connections.LockCenter = UserInputService.InputBegan:Connect(LockCenter)
-	Module.Connections.MouseMovementTrack = UserInputService.InputChanged:Connect(MouseMovementTrack)	
+	Module.Connections.MouseMovementTrack = CAS:BindAction("PlayerInput2", MouseMovementTrack, false, Enum.UserInputType.MouseMovement, Enum.UserInputType.Touch)
+	--UserInputService.InputChanged:Connect(MouseMovementTrack)	
 	RunService:BindToRenderStep("ShiftLock", Enum.RenderPriority.Camera.Value, CameraModes.OverTheShoulder)
 end
 
