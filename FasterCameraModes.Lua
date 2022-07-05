@@ -22,10 +22,14 @@ local Players = game:GetService("Players")
 -------------------------  Constants  ------------------------------
 --------------------------------------------------------------------
 
-local DownVector = Vector3.new(0,-1,0)
 Module.Epsilon = 1e-5
 Module.CameraAngleX = 0
 Module.CameraAngleY = 0
+
+local DownVector = Vector3.new(0,-1,0)
+local Rad2 = math.rad(2)
+local Cos270 = math.cos(270)
+local Sin270 = math.sin(270)
 
 --------------------------------------------------------------------
 
@@ -58,8 +62,9 @@ Module.OverTheShoulder = function(_, CameraAngleX, CameraAngleY, Lerp)
 	Module.CameraAngleY = CameraAngleY or Module.CameraAngleY
 	if Camera.CameraType ~= Enum.CameraType.Scriptable then Camera.CameraType = Enum.CameraType.Scriptable end
 	
-	local Cosy, Siny = math.cos(Module.CameraAngleX),  math.sin(Module.CameraAngleX)
-	local Cosx, Sinx = math.cos(Module.CameraAngleY), math.sin(Module.CameraAngleY)
+	local RadX, RadY = math.rad(Module.CameraAngleX), math.rad(Module.CameraAngleY)
+	local Cosy, Siny = math.cos(RadX),  math.sin(RadX)
+	local Cosx, Sinx = math.cos(RadY), math.sin(RadY)
 	local Origin = CFrame.new((HumanoidRootPart.CFrame.Position)) * CFrame.new(
 		0, 0, 0, 
 		Cosy, Siny*Sinx, Siny*Cosx, 
@@ -69,16 +74,9 @@ Module.OverTheShoulder = function(_, CameraAngleX, CameraAngleY, Lerp)
 	
 	local XOffset, YOffset,  ZOffset= Configs.CamLockOffset.X, Configs.CamLockOffset.Y, Configs.CamLockOffset.Z
 	local X, Y, Z, M11, M12, M13, M21, M22, M23, M31, M32, M33 = Origin:GetComponents()	
-	local Eye = Vector3.new (
-		M11*XOffset+M12*YOffset+M13*ZOffset+X,
-		M21*XOffset+M22*YOffset+M23*ZOffset+Y,
-		M31*XOffset+M32*YOffset+M33*ZOffset+Z
-	)
-	local XAxis = Vector3.new (
-		M11*XOffset+M12*YOffset+M13*-10000+X,
-		M21*XOffset+M22*YOffset+M23*-10000+Y,
-		M31*XOffset+M32*YOffset+M33*-10000+Z
-	)-Eye
+	
+	local Eye = Vector3.new (M11*XOffset+M12*YOffset+M13*ZOffset+X,M21*XOffset+M22*YOffset+M23*ZOffset+Y,M31*XOffset+M32*YOffset+M33*ZOffset+Z)
+	local XAxis = Vector3.new (M11*XOffset+M12*YOffset+M13*-10000+X,M21*XOffset+M22*YOffset+M23*-10000+Y,M31*XOffset+M32*YOffset+M33*-10000+Z)-Eye
 
 	if (XAxis:Dot(XAxis) <= Module.Epsilon) then 
 		Camera.CFrame = CFrame.new(Eye.X, Eye.Y, Eye.Z, 1, 0, 0, 0, 1, 0, 0, 0, 1) 
@@ -255,12 +253,12 @@ Module.FaceCharacterToMouse = function(_, Alpha, GoalCF)
 end
 
 
-local RadY = math.rad(2)
 Module.FollowMouse = function(Dt, Alpha)
-	local Easing = Configs.MouseCameraEasingStyle and TweenService:GetValue(Configs.MouseCameraSmoothness, Configs.MouseCameraEasingStyle, Configs.MouseCameraEasingDirection or Enum.EasingDirection.Out)
-	local Cosy, Siny = math.cos(270),  math.sin(270)
-	local Cosx, Sinx = math.cos(RadY), math.sin(RadY)
+	Alpha = Alpha or Module.MouseAlpha
 	
+	local Easing = Configs.MouseCameraEasingStyle and TweenService:GetValue(Configs.MouseCameraSmoothness, Configs.MouseCameraEasingStyle, Configs.MouseCameraEasingDirection or Enum.EasingDirection.Out)
+	local Cosy, Siny = Cos270, Sin270
+	local Cosx, Sinx = math.cos(Rad2), math.sin(Rad2)
 	local Goal = Head.CFrame * CFrame.new(0, Configs.AspectRatio.Y, Configs.AspectRatio.X) * CFrame.new( -- Given that we know the components of CFrame.new(0, Configs.AspectRatio.Y, Configs.AspectRatio.X), we can simplify the product
 		0, 0, 0, 
 		Cosy, Siny*Sinx, Siny*Cosx, 
@@ -297,13 +295,22 @@ Module.FollowMouse = function(Dt, Alpha)
 		
 		local _, _, _, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents()
 		local Determinant = a11*a22*a33+a12*a23*a31+a13*a21*a32-a11*a23*a32-a12*a21*a33-a13*a22*a31 
-		if Determinant ~= 0 then
-			Neck.C0 = Neck.C0:Lerp(CFrame.new(
-				0, 1, 0, 
-				R11, R12, R13, 
-				R21, R22, R23, 
-				R31, R32, R33
-			), Alpha)
+		if Determinant ~= 0 then -- Fall to a slower case but still pretty nice little fast slerp trick
+			local GoalPos = Vector3.new(x, y, z)
+			local GoalLook = Vector3.new(-R13, -R23, -R33)
+			local Theta = math.acos(MotorC0.lookVector:Dot(GoalLook)) 
+			
+			if Theta < 0.01 then 
+				Neck.C0 = MotorC0 -- Because the rotation difference is practically the same
+			else
+				local Position = MotorC0.Position:Lerp(GoalPos, Alpha)
+				local InvSin = 1/math.sin(Theta)
+				local Rotation = math.sin((1-Alpha)*Theta)*InvSin*MotorC0.LookVector + math.sin(Alpha*Theta)*InvSin*GoalLook
+				Neck.C0 = CFrame.lookAt(
+					Position, 
+					Position + Rotation
+				)
+			end
 		else-- if det is 0, we don't have to calculute for matrix inverse; shortcut lerp. Otherwise, Roblox here probably benefits from SIMD hardware optimizations which typically use elimination methods
 			local ax, ay, az; ax, ay, az, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents() -- too lazy to work with det order
 			local x, y, z = ax,ay, az 
@@ -319,7 +326,7 @@ Module.FollowMouse = function(Dt, Alpha)
 					R21, R22, R23, 
 					R31, R32, R33
 				) 
-			else
+			else -- Best to just use :Lerp to save us here given the computations we already have made, our little fast slerp probably won't be able to save us at this point now...
 				Neck.C0:Lerp(CFrame.new(
 					0, 0, 0, 
 					R11, R12, R13, 
@@ -346,13 +353,23 @@ Module.FollowMouse = function(Dt, Alpha)
 		local _, _, _, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents()
 		local Determinant = a11*a22*a33+a12*a23*a31+a13*a21*a32-a11*a23*a32-a12*a21*a33-a13*a22*a31 
 		if Determinant ~= 0 then
-			Waist.C0 = Waist.C0:Lerp(CFrame.new(
-				0, 0, 0, 
-				R11, R12, R13, 
-				R21, R22, R23, 
-				R31, R32, R33
-			), Alpha)
-			return
+			local GoalPos = Vector3.new(x, y, z)
+			local GoalLook = Vector3.new(-R13, -R23, -R33)
+			local Theta = math.acos(MotorC0.lookVector:Dot(GoalLook)) -- LookVector of goal cframe
+			
+			if Theta < 0.01 then 
+				Waist.C0 = MotorC0 -- Because the rotation difference is practically the same
+				return
+			else
+				local Position = MotorC0.Position:Lerp(GoalPos, Alpha)
+				local InvSin = 1/math.sin(Theta)
+				local Rotation = math.sin((1-Alpha)*Theta)*InvSin*MotorC0.LookVector + math.sin(Alpha*Theta)*InvSin*GoalLook
+				Waist.C0 = CFrame.lookAt(
+					Position, 
+					Position + Rotation
+				)
+				return
+			end
 		else-- if det is 0, we don't have to calculute for matrix inverse; shortcut lerp. Otherwise, Roblox here probably benefits from SIMD hardware optimizations which typically use elimination methods
 			local ax, ay, az; ax, ay, az, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents() -- too lazy to work with det order
 			local x, y, z = ax,ay, az 
@@ -370,7 +387,7 @@ Module.FollowMouse = function(Dt, Alpha)
 				)
 				return
 			else
-				Waist.C0:Lerp(CFrame.new(
+				Waist.C0:Lerp(CFrame.new( -- Best to just use :Lerp to save us here given the computations we already have made, our little fast slerp probably won't be able to save us at this point now...
 					0, 0, 0, 
 					R11, R12, R13, 
 					R21, R22, R23, 
