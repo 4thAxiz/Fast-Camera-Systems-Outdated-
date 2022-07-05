@@ -12,6 +12,8 @@ Module.EnableTopDownCamera() -- Functions are pretty self-documenting
 # Camera Modes
 ## Over The Shoulder
 
+![image](https://user-images.githubusercontent.com/73378249/177252958-51185a06-b85f-4f87-88d4-6ef13d829880.png)
+
 ## Top Down Camera
 ![image](https://user-images.githubusercontent.com/73378249/175833398-4114805f-549b-462c-922a-90277a2c42b6.png)
 
