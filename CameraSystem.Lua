@@ -30,12 +30,14 @@ local function LockCenter(Input)
 end
 
 
-local function MouseMovementTrack(Input)
-	if Input.UserInputType == Enum.UserInputType.MouseMovement then
-		local Delta = Input.Delta
-		CameraModes.OverTheShoulder(nil, CameraModes.CameraAngleX-Delta.X, math.clamp(CameraModes.CameraAngleY-Delta.Y, -75, 75))
+
+local CameraAngleX, CameraAngleY = 0, 0
+local function MouseMovementTrack(_, Input, Object)
+	if Input == Enum.UserInputState.Change then
+		CameraModes.OverTheShoulder(nil, CameraModes.CameraAngleX-Object.Delta.X, math.clamp(CameraModes.CameraAngleY-Object.Delta.Y*0.4, -75, 75))
 	end
 end
+
 
 
 
