@@ -321,7 +321,7 @@ Module.FollowMouse = function(Dt, Alpha)
 		R21, R22, R23 = 0, 0, a21*R13+a22*R23+a23*R33
 		R31, R32, R33 = 0, 0, a31*R13+a32*R23+a33*R33
 		
-		local _, _, _, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents()
+		local ax, ay, az, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents()
 		local Determinant = a11*a22*a33+a12*a23*a31+a13*a21*a32-a11*a23*a32-a12*a21*a33-a13*a22*a31 
 		if Determinant ~= 0 then -- Fall to a slower case but still pretty nice little fast slerp trick
 			local GoalPos = Vector3.new(x, y, z)
@@ -340,7 +340,6 @@ Module.FollowMouse = function(Dt, Alpha)
 				)
 			end
 		else-- if det is 0, we don't have to calculute for matrix inverse; shortcut lerp. Otherwise, Roblox here probably benefits from SIMD hardware optimizations which typically use elimination methods
-			local ax, ay, az; ax, ay, az, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents() -- too lazy to work with det order
 			local x, y, z = ax,ay, az 
 			R11, R12, R13 = 0, 0, a11*R13+a12*R23+a13*R33 -- convert goal to start's object space with inversion omitted
 			R21, R22, R23 = 0, 0, a21*R13+a22*R23+a23*R33
@@ -378,7 +377,7 @@ Module.FollowMouse = function(Dt, Alpha)
 		R21, R22, R23 = 0, 0, a21*R13+a22*R23+a23*R33
 		R31, R32, R33 = 0, 0, a31*R13+a32*R23+a33*R33
 
-		local _, _, _, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents()
+		local ax, ay, az, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents()
 		local Determinant = a11*a22*a33+a12*a23*a31+a13*a21*a32-a11*a23*a32-a12*a21*a33-a13*a22*a31 
 		if Determinant ~= 0 then
 			local GoalPos = Vector3.new(x, y, z)
@@ -399,7 +398,6 @@ Module.FollowMouse = function(Dt, Alpha)
 				return
 			end
 		else-- if det is 0, we don't have to calculute for matrix inverse; shortcut lerp. Otherwise, Roblox here probably benefits from SIMD hardware optimizations which typically use elimination methods
-			local ax, ay, az; ax, ay, az, a11, a12, a13, a21, a22, a23, a31, a32, a33 = MotorC0:GetComponents() -- too lazy to work with det order
 			local x, y, z = ax,ay, az 
 			R11, R12, R13 = 0, 0, a11*R13+a12*R23+a13*R33 -- convert goal to start's object space with inversion omitted
 			R21, R22, R23 = 0, 0, a21*R13+a22*R23+a23*R33
