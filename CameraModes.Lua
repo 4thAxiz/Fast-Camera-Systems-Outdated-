@@ -24,7 +24,6 @@
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
-
 ]] --------------------------------------------------------------------
 
 
@@ -84,6 +83,13 @@ Neck.MaxVelocity = 1/3
 --------------------------------------------------------------------
 --------------------------  Privates  ------------------------------
 --------------------------------------------------------------------
+
+local function DisableRobloxCamera()
+	if Camera.CameraType ~= Enum.CameraType.Scriptable then 
+		Camera.CameraType = Enum.CameraType.Scriptable
+	end
+end
+
 
 local function GetRotationXY(X, Y)
 	X = X or Module.CameraAngleX
@@ -340,10 +346,10 @@ end
 -------------------------  Functions  ------------------------------
 --------------------------------------------------------------------
 
-Module.OverTheShoulder = function(_, CameraAngleX, CameraAngleY, Lerp)
+Module.OverTheShoulder = function(_, CameraAngleX, CameraAngleY, Lerp)	
 	Module.CameraAngleX = CameraAngleX or Module.CameraAngleX
 	Module.CameraAngleY = CameraAngleY or Module.CameraAngleY	
-	if Camera.CameraType ~= Enum.CameraType.Scriptable then Camera.CameraType = Enum.CameraType.Scriptable end
+	DisableRobloxCamera()
 
 	local Origin = CFrame.new((HumanoidRootPart.CFrame.Position)) * GetRotationXY(math.rad(Module.CameraAngleX), math.rad(Module.CameraAngleY))
 	local Eye = GetPositionToWorldByOffset(Origin)
@@ -357,6 +363,7 @@ Module.IsometricCamera = function(_, CameraDepth, HeightOffset, FOV)
 	CameraDepth = CameraDepth or Configs.IsometricCameraDepth
 	HeightOffset = HeightOffset or Configs.IsometricHeightOffset
 	Camera.FieldOfView = FOV or Configs.IsometricFieldOfView
+	DisableRobloxCamera()
 
 	local Root = HumanoidRootPart.Position + Vector3.new(0, HeightOffset, 0)
 	local Eye = Root + Vector3.new(CameraDepth, CameraDepth, CameraDepth)	
@@ -368,6 +375,7 @@ Module.SideScrollingCamera = function(_, CameraDepth, HeightOffset, FOV)
 	CameraDepth = CameraDepth or Configs.SideCameraDepth
 	HeightOffset = HeightOffset or Configs.SideHeightOffset
 	Camera.FieldOfView = FOV or Configs.SideFieldOfView
+	DisableRobloxCamera()
 
 	local Focus = HumanoidRootPart.Position + Vector3.new(0, HeightOffset, 0)
 	local Eye = Vector3.new(Focus.X, Focus.Y, CameraDepth)
@@ -381,9 +389,10 @@ Module.TopDownCamera = function(_, FaceMouse, MouseSensitivity, Offset, Directio
 	Distance = Distance or Configs.TopDownDistance
 	Direction = Direction or DownVector
 	Offset = Offset or Configs.TopDownOffset
-	
-	local Mx, My = UserInputService:GetMouseLocation()
-	local Axis = Vector3.new(-((My-ScreenSizeY*0.5)*PixelCoordinateRatioY),0,((Mx-ScreenSizeX*0.5)*PixelCoordinateRatioX))
+	DisableRobloxCamera()
+
+	local M = UserInputService:GetMouseLocation()
+	local Axis = Vector3.new(-((M.y-ScreenSizeY*0.5)*PixelCoordinateRatioY),0,((M.x-ScreenSizeX*0.5)*PixelCoordinateRatioX))
 	
 	local Eye = (Distance + (Root.Position+Offset)) + Axis * MouseSensitivity 
 	local Focus = Eye + Direction
@@ -417,10 +426,14 @@ Module.FaceCharacterToMouse = function(_, Alpha, GoalCF)
 end
  
 
-Module.FollowMouse = function(Dt, Alpha)
+Module.FollowMouse = function(Dt, Alpha, XOffset, YOffset)
 	Alpha = Alpha or Configs.MouseAlpha
+	XOffset = XOffset or Configs.MouseXOffset
+	YOffset = YOffset or Configs.MouseYOffset
+	DisableRobloxCamera()
+
 	local Easing = Configs.MouseCameraEasingStyle and TweenService:GetValue(Configs.MouseCameraSmoothness, Configs.MouseCameraEasingStyle, Configs.MouseCameraEasingDirection or Enum.EasingDirection.Out)
-	local Goal = Head.CFrame * CFrame.new(0, Configs.AspectRatio.Y, Configs.AspectRatio.X) * GetRotationXY(270, math.rad(2))
+	local Goal = Head.CFrame * CFrame.new(0, Configs.AspectRatio.Y, Configs.AspectRatio.X) * GetRotationXY(XOffset, math.rad(YOffset))
 	if Easing then
 		Camera.CFrame = Camera.CFrame:Lerp(Goal, Easing)
 	else
