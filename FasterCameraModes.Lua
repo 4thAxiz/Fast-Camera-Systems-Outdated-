@@ -281,7 +281,7 @@ end
 
 
 Module.FollowMouse = function(Dt, Alpha)
-	Alpha = Alpha or Module.MouseAlpha
+	Alpha = Alpha or Configs.MouseAlpha
 	
 	local Easing = Configs.MouseCameraEasingStyle and TweenService:GetValue(Configs.MouseCameraSmoothness, Configs.MouseCameraEasingStyle, Configs.MouseCameraEasingDirection or Enum.EasingDirection.Out)
 	local Cosy, Siny = Cos270, Sin270
