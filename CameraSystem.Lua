@@ -17,7 +17,7 @@ local CameraModes = require(script:WaitForChild("CameraModes"))
 
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local CAS = game:GetService("ContextActionService")
+local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 
 --------------------------------------------------------------------
@@ -48,8 +48,7 @@ end
 
 function Module.EnableShiftLockCamera()
 	Module.Connections.LockCenter = UserInputService.InputBegan:Connect(LockCenter)
-	Module.Connections.MouseMovementTrack = CAS:BindAction("PlayerInput2", MouseMovementTrack, false, Enum.UserInputType.MouseMovement, Enum.UserInputType.Touch)
-	--UserInputService.InputChanged:Connect(MouseMovementTrack)	
+	ContextActionService:BindAction("MouseMovementTrack", MouseMovementTrack, false, Enum.UserInputType.MouseMovement, Enum.UserInputType.Touch)
 	RunService:BindToRenderStep("ShiftLock", Enum.RenderPriority.Camera.Value, CameraModes.OverTheShoulder)
 end
 
@@ -57,8 +56,8 @@ function Module.DisableShiftLockCamera()
 	if not Module.Connections.LockCenter and not Module.Connections.MouseMovementTrack then return end
 
 	Module.Connections.LockCenter:Disconnect()
-	Module.Connections.MouseMovementTrack:Disconnect()
-	RunService:UnBindToRenderStep("ShiftLock")
+	ContextActionService:UnbindAction("MouseMovementTrack")
+	RunService:UnbindFromRenderStep("ShiftLock")
 end
 
 ---------------------------
@@ -71,7 +70,7 @@ function Module.EnableIsometricCamera()
 end
 
 function Module.DisableIsometricCamera()
-	RunService:UnBindToRenderStep("IsometricCamera")
+	RunService:UnbindFromRenderStep("IsometricCamera")
 end
 
 ---------------------------
@@ -84,7 +83,7 @@ function Module.EnableTopDownCamera()
 end 
 
 function Module.DisableTopDownCamera()
-	RunService:UnBindToRenderStep("TopDown")
+	RunService:UnbindFromRenderStep("TopDown")
 
 end
 
@@ -111,7 +110,7 @@ function Module.FollowMouse()
 end
 
 function Module.StopFollowingMouse()
-	RunService:UnBindToRenderStep("FollowMouse")
+	RunService:UnbindFromRenderStep("FollowMouse")
 end
 
 ---------------------------
