@@ -1,3 +1,7 @@
+-- This module is a faster but slightly less readable version.
+-- This module also contains the exact same functionality, there 
+-- is no difference apart from speed-ups.
+
 --[[ --------------------------------------------------------------------
 
 -- 4thAxis
