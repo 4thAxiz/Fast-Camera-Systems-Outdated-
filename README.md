@@ -1,3 +1,5 @@
+# Disclaimer, outdated optimizations. Use for the intention of functionality!
+-------------------------------------
 # Fast-Camera-Systems
 
 Probably the most optimized and fastest Camera you'll find written for the Roblox engine-- pretty easy to use...
